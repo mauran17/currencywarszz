@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capitalism: Currency Wars</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101827;color:#e5edf8;font-family:Arial,sans-serif}
+header{padding:22px 5%;background:#18243a;border-bottom:1px solid #34445e}
+h1{margin:0;color:#68e0b2;font-size:27px}
+header p{color:#a7b7d0;margin-bottom:0}
+main{max-width:1150px;margin:auto;padding:20px}
+h2{font-size:18px;margin-top:0;color:#8ee8ca}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px}
+.panel{background:#1a263a;border:1px solid #34445e;border-radius:12px;padding:17px;margin-bottom:16px}
+.stat{font-size:24px;font-weight:bold;margin:8px 0;color:#fff}
+.muted{color:#9caec6;font-size:13px}
+button{background:#48c99a;color:#10251f;border:0;padding:10px 13px;border-radius:7px;font-weight:bold;cursor:pointer;margin:4px 3px 4px 0}
+button:hover{filter:brightness(1.1)}
+button:disabled{opacity:.35;cursor:not-allowed}
+.red{background:#fa7d7d;color:#301515}
+.blue{background:#7daeff;color:#13203a}
+.gold{background:#ffd36b;color:#33240b}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:11px 7px;border-bottom:1px solid #34445e}
+th{color:#9fb2ce}
+.up{color:#68e0b2}.down{color:#ff8989}
+.bar{height:9px;background:#34445e;border-radius:5px;overflow:hidden}
+.bar div{height:100%;background:#48c99a;transition:width .3s}
+#log{max-height:200px;overflow:auto;font-size:13px;line-height:1.7}
+#news{color:#ffd36b;line-height:1.5}
+hr{border:0;border-top:1px solid #34445e;margin:15px 0}
+footer{text-align:center;color:#8294ad;padding:20px;font-size:12px}
+
+/* START PAGE */
+#startScreen{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  background:radial-gradient(circle at top,#263b58,#101827 65%);
+}
+.startBox{
+  width:100%;
+  max-width:620px;
+  padding:30px;
+  background:#1a263a;
+  border:1px solid #405471;
+  border-radius:18px;
+  box-shadow:0 15px 50px #0006;
+}
+.logo{text-align:center;margin-bottom:28px}
+.logo h1{font-size:32px;color:#68e0b2}
+.logo p{color:#a7b7d0;line-height:1.6}
+label{display:block;margin:15px 0 8px;font-weight:bold}
+input{
+  width:100%;padding:13px;border-radius:8px;
+  background:#101827;color:white;
+  border:1px solid #405471;font-size:16px;
+}
+.difficulty{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;margin:12px 0 20px;
+}
+.diff{
+  background:#101827;color:white;
+  border:2px solid #405471;
+  padding:15px 7px;border-radius:10px;
+  margin:0;text-align:center;
+}
+.diff.selected{border-color:#68e0b2;background:#203a35}
+.diff strong{display:block;font-size:17px;margin-bottom:8px}
+.diff small{font-size:12px;color:#a7b7d0;line-height:1.5}
+#startButton{width:100%;padding:15px;font-size:17px;margin:10px 0 0}
+#gameArea{display:none}
+#playerLabel{color:#68e0b2;font-weight:bold}
+#endPanel{text-align:center;padding:30px}
+@media(max-width:450px){
+ .difficulty{grid-template-columns:1fr}
+ .diff{display:flex;justify-content:space-between;align-items:center;text-align:left}
+ .startBox{padding:20px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- START / LOGIN PAGE -->
+<div id="startScreen">
+  <div class="startBox">
+    <div class="logo">
+      <h1>🌍 CAPITALISM</h1>
+      <h2>CURRENCY WARS</h2>
+      <p>
+        Build your economy. Control the market.<br>
+        Defeat your rival and become an economic superpower.
+      </p>
+    </div>
+
+    <label for="playerName">👤 Enter your player name</label>
+    <input id="playerName" type="text" maxlength="20"
+      placeholder="Your name..." value="Player">
+
+    <label>🎮 Select Difficulty</label>
+
+    <div class="difficulty">
+      <button class="diff selected" id="easy"
+        onclick="selectDifficulty('easy')">
+        <strong>🟢 EASY</strong>
+        <small>Target:<br>40,000 cr</small>
+      </button>
+
+      <button class="diff" id="medium"
+        onclick="selectDifficulty('medium')">
+        <strong>🟡 MEDIUM</strong>
+        <small>Target:<br>80,000 cr</small>
+      </button>
+
+      <button class="diff" id="hard"
+        onclick="selectDifficulty('hard')">
+        <strong>🔴 HARD</strong>
+        <small>Target:<br>140,000 cr</small>
+      </button>
+    </div>
+
+    <div class="panel">
+      <h2>📜 Game Rules</h2>
+      <p class="muted">
+        1. Start with 10,000 cr.<br>
+        2. Build factories and generate income.<br>
+        3. Trade foreign currencies.<br>
+        4. Manage interest rates and monetary policy.<br>
+        5. Beat Borealia before 20 rounds end.<br>
+        6. Reach your selected wealth target.
+      </p>
+    </div>
+
+    <button id="startButton" onclick="startGame()">
+      START GAME →
+    </button>
+  </div>
+</div>
+
+<!-- MAIN GAME -->
+<div id="gameArea">
+
+<header>
+  <h1>🌍 CAPITALISM: CURRENCY WARS</h1>
+  <p>
+    President: <span id="playerLabel">Player</span>
+    &nbsp;|&nbsp;
+    Difficulty: <span id="difficultyLabel">EASY</span>
+  </p>
+</header>
+
+<main>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="muted">KAS NEGARA</div>
+      <div class="stat" id="cash">10.000 cr</div>
+      <div class="muted">Uang siap digunakan</div>
+    </section>
+
+    <section class="panel">
+      <div class="muted">TOTAL KEKAYAAN</div>
+      <div class="stat" id="wealth">10.000 cr</div>
+      <div class="muted">Kas + aset + cadangan valas</div>
+    </section>
+
+    <section class="panel">
+      <div class="muted">PUTARAN</div>
+      <div class="stat" id="turn">1 / 20</div>
+      <div class="muted" id="phase">Ekonomi sedang berjalan</div>
+    </section>
+
+    <section class="panel">
+      <div class="muted">INDEKS MATA UANG NUSA</div>
+      <div class="stat" id="index">100.0</div>
+      <div class="muted">Nilai awal = 100</div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="row">
+      <h2>🏆 Victory Progress</h2>
+      <b id="targetLabel">40.000 cr</b>
+    </div>
+    <div class="bar">
+      <div id="progress" style="width:0%"></div>
+    </div>
+    <p class="muted" id="progressText">0% of wealth target</p>
+    <p class="muted" id="rivalProgress">
+      Rival wealth: 12.000 cr
+    </p>
+  </section>
+
+  <div class="grid">
+
+    <section class="panel">
+      <h2>📊 Currency Market</h2>
+      <p class="muted">Harga per unit mata uang asing.</p>
+      <table>
+        <thead>
+          <tr><th>Currency</th><th>Price</th><th>Action</th></tr>
+        </thead>
+        <tbody id="market"></tbody>
+      </table>
+      <p class="muted">
+        Buy low, sell high. Transaction fee: 1%.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>🏭 Business & Industry</h2>
+      <div class="row">
+        <span>Factories owned</span>
+        <b id="factories">0</b>
+      </div>
+      <div class="row">
+        <span>Income per round</span>
+        <b id="income">0 cr</b>
+      </div>
+      <hr>
+      <p class="muted">Build factories to generate passive income.</p>
+      <button onclick="buildFactory()">
+        Build Factory — 2.500 cr
+      </button>
+      <hr>
+      <div class="row">
+        <span>Technology</span>
+        <b id="tech">Level 1</b>
+      </div>
+      <button class="blue" onclick="upgradeTech()">
+        Research — 2.000 cr
+      </button>
+    </section>
+
+    <section class="panel">
+      <h2>🏦 Central Bank</h2>
+      <div class="row">
+        <span>Interest rate</span>
+        <b id="rate">5%</b>
+      </div>
+      <p class="muted">
+        Higher interest rates can strengthen currency,
+        but may affect business activity.
+      </p>
+      <button class="blue" onclick="changeRate(1)">+1%</button>
+      <button class="red" onclick="changeRate(-1)">-1%</button>
+      <hr>
+      <div class="row">
+        <span>Foreign reserves</span>
+        <b id="reserves">0 cr</b>
+      </div>
+      <button class="gold" onclick="intervene()">
+        Market Intervention — 1.000 cr
+      </button>
+    </section>
+
+    <section class="panel">
+      <h2>🌐 Rival Country</h2>
+      <div class="row">
+        <span>Republic of Borealia</span>
+        <b id="rivalWealth">12.000 cr</b>
+      </div>
+      <div class="row">
+        <span>Currency index</span>
+        <b id="rivalIndex">100.0</b>
+      </div>
+      <hr>
+      <p class="muted">
+        Your economy must become richer than Borealia.
+      </p>
+    </section>
+
+  </div>
+
+  <section class="panel">
+    <div class="row">
+      <div>
+        <h2>📰 Economic News</h2>
+        <div id="news">Market opened.</div>
+      </div>
+      <button class="gold" id="next" onclick="nextTurn()">
+        End Round →
+      </button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>📜 Economic History</h2>
+    <div id="log">
+      Your government has started with 10,000 cr.
+    </div>
+  </section>
+
+  <section class="panel" id="endPanel" style="display:none">
+    <h2 id="endTitle">GAME OVER</h2>
+    <p id="endText"></p>
+    <button onclick="location.reload()">Play Again ↻</button>
+  </section>
+
+</main>
+<footer>
+  CAPITALISM: CURRENCY WARS · ECONOMIC SIMULATION
+</footer>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
